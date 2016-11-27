@@ -5,7 +5,7 @@ import java.util.*;
 public class Calculator
 {
 	//单项式类
-	private static class Monomial
+	public static class Monomial
 	{
 		//表达式中的元素
 		Double coefficient;//系数
@@ -14,7 +14,7 @@ public class Calculator
 		Monomial(String monomial)
 		{
 			coefficient = 1.0;
-			vars = new HashMap<String, Integer>();
+			vars = new HashMap<>();
 			String var;//变量名
 			int index;//指数
 
@@ -175,7 +175,7 @@ public class Calculator
     }
 
 	//将字符串表达式转换成自定义数据类型
-	static ArrayList<Monomial> expression(String input)
+	public static ArrayList<Monomial> expression(String input)
 	{
 		ArrayList <Monomial> exp = new ArrayList <Monomial> ();//表达式
 
@@ -186,11 +186,22 @@ public class Calculator
 		return exp;
 	}
 	//按照输入的值对表达式进行计算
-	static void simplify(ArrayList <Monomial> exp, String input)
+	public static void simplify(ArrayList <Monomial> exp, String input)
 	{
 		ArrayList <Monomial> result = new ArrayList <Monomial>();
 		HashMap <String,Double> solves = new HashMap <String,Double>();
 
+		//对传入参数进行控制
+		if(exp == null)
+		{
+			System.out.println("No expression specified!");
+			return;
+		}
+		if(!input.matches("!simplify[\\s\\-A-Za-z0-9=.]*$"))
+		{
+			System.out.println("Invalid input, should be start with '!simplify'");
+			return;
+		}
 		//得到单个赋值表达式，进行处理，得到赋值表
 		String[] assigns = input.substring(9).split("\\s+");
 		for(String assign : assigns)
@@ -261,6 +272,8 @@ public class Calculator
 			return;
 		}
 		int count= 0;//用来计算表达式中是否有这个变量
+		if(exp==null)
+			return;
 		for(int i=0,j=0; j<exp.size(); i++,j++)
 		{
 			Monomial monomial = exp.get(j);//处理一个单项式
@@ -270,13 +283,13 @@ public class Calculator
 			{
 				result.remove(i);
 				count += 1;
+				if(count==exp.size())
+				{
+					System.out.println("Error! no variable!");
+					return;
+				}
 				i--;
 				continue;
-			}
-			if(count==exp.size())
-			{
-				System.out.println("Error! no variable!");
-				return;
 			}
 			for(String var: monomial.vars.keySet())//逐个规定变量
 			{
@@ -303,6 +316,11 @@ public class Calculator
 			if(scan.hasNextLine())
 			{
 				String input = scan.nextLine();
+				if(input.equals("#"))
+				{
+					scan.close();
+					return;
+				}
 				/*根据多项表达式定义多项式格式：
 				 1.+-*符号支持零个或者多个whitespace (spaces, tabs and new lines).
 				 2.数字前面的*不能省略，然而字母前面的*可以省略。
